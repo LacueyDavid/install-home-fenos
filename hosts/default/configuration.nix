@@ -1,5 +1,22 @@
 { pkgs, ... }:
-{
+let
+  fennosSessionLauncher = pkgs.writeShellScript "fennos-session-launcher" ''
+    set -euo pipefail
+
+    if ${pkgs.systemd}/bin/systemd-detect-virt -q; then
+      # VM-only workarounds for Hyprland on virtio/mesa in QEMU.
+      export AQ_DRM_DEVICES=/dev/dri/card1
+      export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+      export GALLIUM_DRIVER=llvmpipe
+      export WLR_RENDERER_ALLOW_SOFTWARE=1
+      export LIBGL_ALWAYS_SOFTWARE=1
+      export WLR_NO_HARDWARE_CURSORS=1
+      exec ${pkgs.bash}/bin/bash -lc 'exec dbus-run-session sh -lc "Hyprland || exec sway"'
+    fi
+
+    exec dbus-run-session Hyprland
+  '';
+in {
   # Ensure stage-1 can see the virtual disk and open the LUKS container
   # before mounting / from /dev/mapper/crypted.
   boot.initrd.availableKernelModules = [
@@ -45,7 +62,7 @@
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd 'dbus-run-session sh -lc \"Hyprland || exec sway\"'";
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${fennosSessionLauncher}";
       user = "greeter";
     };
   };

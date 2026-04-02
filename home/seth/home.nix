@@ -28,15 +28,6 @@
         "mako"
       ];
 
-      env = [
-        "AQ_DRM_DEVICES,/dev/dri/card1"
-        "MESA_LOADER_DRIVER_OVERRIDE,llvmpipe"
-        "GALLIUM_DRIVER,llvmpipe"
-        "WLR_RENDERER_ALLOW_SOFTWARE,1"
-        "LIBGL_ALWAYS_SOFTWARE,1"
-        "WLR_NO_HARDWARE_CURSORS,1"
-      ];
-
       input = {
         kb_layout = "fr";
         follow_mouse = 1;
