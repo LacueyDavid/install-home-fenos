@@ -50,6 +50,7 @@ in {
   system.stateVersion = "25.05";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.download-buffer-size = 134217728;
   nixpkgs.config.allowUnfree = true;
 
   # Keep broad Wi-Fi firmware support on the fully configured installed system.
