@@ -12,9 +12,14 @@ let
     exec dbus-run-session Hyprland
   '';
 in {
-  # Ensure stage-1 can see the virtual disk and open the LUKS container
-  # before mounting / from /dev/mapper/crypted.
+  # Keep initrd modules broad enough for physical hardware and VMs.
   boot.initrd.availableKernelModules = [
+    "nvme"
+    "xhci_pci"
+    "usbhid"
+    "usb_storage"
+    "uas"
+    "sr_mod"
     "virtio_pci"
     "virtio_blk"
     "virtio_scsi"
@@ -28,11 +33,20 @@ in {
     allowDiscards = true;
   };
 
-  # Keep disk/boot definitions aligned with the bootstrap disko layout.
+  # Keep disk/boot definitions aligned with bootstrap disko layout: LUKS + LVM.
   fileSystems."/" = {
-    device = "/dev/mapper/crypted";
+    device = "/dev/mapper/crypted--vg-root";
     fsType = "ext4";
   };
+
+  fileSystems."/home" = {
+    device = "/dev/mapper/crypted--vg-home";
+    fsType = "ext4";
+  };
+
+  swapDevices = [
+    { device = "/dev/mapper/crypted--vg-swap"; }
+  ];
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-partlabel/disk-main-ESP";
@@ -48,6 +62,9 @@ in {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
 
+  # Keep broad Wi-Fi firmware support on the fully configured installed system.
+  hardware.enableRedistributableFirmware = true;
+
   # Explicitly enable graphics userspace required by Wayland compositors.
   hardware.graphics.enable = true;
 
@@ -61,6 +78,10 @@ in {
       user = "greeter";
     };
   };
+
+  # Keep the current graphical/tty session stable during `nixos-rebuild switch`.
+  # New greetd config is applied on next reboot.
+  systemd.services.greetd.restartIfChanged = false;
 
   programs.hyprland = {
     enable = true;
@@ -94,6 +115,8 @@ in {
   services.openssh.enable = true;
 
   environment.systemPackages = with pkgs; [
+    # Keep nmcli available on the final installed system after rebuild.
+    networkmanager
     git
     neovim
     wget
