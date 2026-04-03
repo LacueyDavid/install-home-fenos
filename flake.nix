@@ -1,5 +1,5 @@
 {
-  description = "Fennos post-install config (NixOS + Home Manager)";
+  description = "Fenos post-install config (NixOS + Home Manager)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

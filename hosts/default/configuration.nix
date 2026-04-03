@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  fennosSessionLauncher = pkgs.writeShellScript "fennos-session-launcher" ''
+  fenosSessionLauncher = pkgs.writeShellScript "fenos-session-launcher" ''
     set -euo pipefail
 
     if ${pkgs.systemd}/bin/systemd-detect-virt -q; then
@@ -57,7 +57,7 @@ in {
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${fennosSessionLauncher}";
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${fenosSessionLauncher}";
       user = "greeter";
     };
   };
