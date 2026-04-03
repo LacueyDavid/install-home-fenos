@@ -9,23 +9,28 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
-    in {
-      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+      homeManagerModule = {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.backupFileExtension = "hm-backup";
+        home-manager.users.seth = import ./home/seth/home.nix;
+        home-manager.users.root = import ./home/root/home.nix;
+      };
+
+      mkHost = hostModule: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./hosts/default/configuration.nix
+          hostModule
           home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup";
-            home-manager.users.seth = import ./home/seth/home.nix;
-            home-manager.users.root = import ./home/root/home.nix;
-          }
+          homeManagerModule
         ];
       };
+    in {
+      nixosConfigurations.pc = mkHost ./hosts/pc/configuration.nix;
+      nixosConfigurations.vm = mkHost ./hosts/vm/configuration.nix;
+      nixosConfigurations.default = self.nixosConfigurations.pc;
     };
 }

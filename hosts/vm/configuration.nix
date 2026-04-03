@@ -19,7 +19,7 @@ in
 
   # VM-only compositor fallback to avoid blank sessions on fragile virtual GPUs.
   services.greetd.settings.default_session = {
-    command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${fenosVmSessionLauncher}";
-    user = "greeter";
+    command = lib.mkForce "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${fenosVmSessionLauncher}";
+    user = lib.mkForce "greeter";
   };
 }

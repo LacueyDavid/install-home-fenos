@@ -2,17 +2,10 @@
 let
   fenosSessionLauncher = pkgs.writeShellScript "fenos-session-launcher" ''
     set -euo pipefail
-
-    if ${pkgs.systemd}/bin/systemd-detect-virt -q; then
-      # In VMs, keep a compositor fallback but avoid forcing software rendering,
-      # which can crash mesa/llvmpipe on some virtio setups.
-      exec ${pkgs.bash}/bin/bash -lc 'exec dbus-run-session sh -lc "Hyprland || exec sway"'
-    fi
-
     exec dbus-run-session Hyprland
   '';
 in {
-  # Keep initrd modules broad enough for physical hardware and VMs.
+  # Physical profile: no VM-specific virtio tuning here.
   boot.initrd.availableKernelModules = [
     "nvme"
     "xhci_pci"
@@ -20,9 +13,6 @@ in {
     "usb_storage"
     "uas"
     "sr_mod"
-    "virtio_pci"
-    "virtio_blk"
-    "virtio_scsi"
     "ahci"
     "sd_mod"
   ];
