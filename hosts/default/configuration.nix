@@ -46,12 +46,28 @@ in {
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.tmp.cleanOnBoot = true;
 
   system.stateVersion = "25.05";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.download-buffer-size = 134217728;
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
+    download-buffer-size = 134217728;
+  };
+
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
   nixpkgs.config.allowUnfree = true;
+
+  time.timeZone = "Europe/Paris";
+  i18n.defaultLocale = "fr_FR.UTF-8";
+
+  console.useXkbConfig = true;
 
   # Keep broad Wi-Fi firmware support on the fully configured installed system.
   hardware.enableRedistributableFirmware = true;
@@ -59,7 +75,14 @@ in {
   # Explicitly enable graphics userspace required by Wayland compositors.
   hardware.graphics.enable = true;
 
-  networking.networkmanager.enable = true;
+  networking = {
+    networkmanager.enable = true;
+    networkmanager.wifi.powersave = false;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 ];
+    };
+  };
 
   services.xserver.enable = false;
   services.greetd = {
@@ -80,6 +103,8 @@ in {
   };
 
   programs.sway.enable = true;
+  programs.zsh.enable = true;
+  programs.nix-ld.enable = true;
 
   xdg.portal = {
     enable = true;
@@ -91,33 +116,49 @@ in {
   };
 
   security.polkit.enable = true;
+  security.rtkit.enable = true;
 
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
+    jack.enable = true;
+  };
+
+  services.fwupd.enable = true;
+
+  services.journald.extraConfig = ''
+    SystemMaxUse=500M
+    RuntimeMaxUse=200M
+  '';
+
+  zramSwap = {
+    enable = true;
+    memoryPercent = 25;
   };
 
   users.users.seth = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
+    shell = pkgs.zsh;
   };
 
   services.openssh.enable = true;
 
+  environment.variables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
+
   environment.systemPackages = with pkgs; [
-    # Keep nmcli available on the final installed system after rebuild.
+    # Keep a minimal rescue-friendly base at system level.
     networkmanager
+    curl
+    fd
+    htop
     git
     neovim
+    ripgrep
     wget
-    kitty
-    waybar
-    wofi
-    mako
-    hyprpaper
-    wl-clipboard
-    grim
-    slurp
   ];
 }
