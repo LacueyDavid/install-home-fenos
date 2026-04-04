@@ -1,8 +1,9 @@
-{ ... }:
+{ pkgs, ... }:
 {
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
+    plugins = [ pkgs.hyprlandPlugins.hyprbars ];
     settings = {
       "$mod" = "SUPER";
       monitor = ",preferred,auto,1";
@@ -113,6 +114,23 @@
 
       cursor = {
         no_hardware_cursors = true;
+      };
+
+      plugin = {
+        hyprbars = {
+          bar_height = 30;
+          bar_padding = 10;
+          bar_button_padding = 5;
+          bar_precedence_over_border = true;
+          bar_part_of_window = true;
+          bar_color = "rgba(151218FF)";
+          "col.text" = "rgba(e7e0e8FF)";
+          hyprbars-button = [
+            "rgb(e7e0e8), 13, x, hyprctl dispatch killactive"
+            "rgb(e7e0e8), 13, o, hyprctl dispatch fullscreen 1"
+            "rgb(e7e0e8), 13, s, hyprctl dispatch movetoworkspacesilent special"
+          ];
+        };
       };
 
       bind = [

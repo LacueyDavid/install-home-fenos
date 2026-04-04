@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "dots-hyprland": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775242237,
+        "narHash": "sha256-rd/w2xGC2K9AzDTCyuW4xVMmSUICD7P4MlJ/nfknSW4=",
+        "owner": "end-4",
+        "repo": "dots-hyprland",
+        "rev": "799bfae18463a2513b8ecee1adb0d99f22d77073",
+        "type": "github"
+      },
+      "original": {
+        "owner": "end-4",
+        "repo": "dots-hyprland",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -95,6 +111,7 @@
     },
     "root": {
       "inputs": {
+        "dots-hyprland": "dots-hyprland",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim"
