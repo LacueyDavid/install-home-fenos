@@ -145,7 +145,7 @@ in {
     '';
   };
 
-  xdg.configFile."quickshell/ii".source = ./live/quickshell/ii;
+  xdg.configFile."quickshell".source = ./live/quickshell;
   xdg.configFile."illogical-impulse/config.json".source = iiConfig;
 
   programs.wofi = {
