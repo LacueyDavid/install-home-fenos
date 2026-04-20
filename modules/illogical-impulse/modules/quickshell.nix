@@ -1,4 +1,4 @@
-@illogical-impulse-dotfiles: inputs: { config, lib, pkgs, ... }:
+illogical-impulse-dotfiles: inputs: { config, lib, pkgs, ... }:
 let
   cfg = config.illogical-impulse;
 in

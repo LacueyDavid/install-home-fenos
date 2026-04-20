@@ -16,6 +16,11 @@
       combinePlugins.enable = false;
     };
 
+    extraPlugins = with pkgs.vimPlugins; [
+      codecompanion-nvim
+      nui-nvim
+    ];
+
     extraConfigVim = ''
       set autowrite
       set nobackup
@@ -33,7 +38,6 @@
       set visualbell
       set colorcolumn=+1
       set list
-      set fillchars=vert:|
       set mouse=a
       set showmatch
       set wrap
@@ -55,8 +59,6 @@
       set expandtab
       set smarttab
       set autoindent
-
-      set fillchars+=diff:/
 
       set clipboard=unnamedplus
       set termguicolors
@@ -320,6 +322,8 @@
     };
 
     extraConfigLua = ''
+      vim.opt.fillchars = { vert = '│', diff = '/' }
+
       vim.diagnostic.config({
         virtual_text = true,
         severity_sort = true,
@@ -378,6 +382,107 @@
       map("n", "<leader>dh", "<cmd>DiffviewFileHistory<CR>", { desc = "Diffview history" })
 
       map("n", "<leader>tr", "<cmd>ToggleTerm<CR>", { desc = "Terminal" })
+
+      -- ── CodeCompanion (Claude claude-opus-4-7 via Anthropic API) ─────────
+      require('codecompanion').setup({
+        adapters = {
+          anthropic = function()
+            return require('codecompanion.adapters').extend('anthropic', {
+              schema = {
+                model     = { default = 'claude-opus-4-7' },
+                max_tokens = { default = 8096 },
+              },
+            })
+          end,
+        },
+        strategies = {
+          chat   = { adapter = 'anthropic' },
+          inline = { adapter = 'anthropic' },
+          agent  = { adapter = 'anthropic' },
+        },
+        display = {
+          chat = {
+            window = { layout = 'vertical', width = 0.55 },
+            show_settings = true,
+          },
+          diff = { provider = 'default' },
+        },
+        -- Superpowers: 5-phase prompt available with :CodeCompanionActions
+        prompt_library = {
+          ['Superpowers: 5-Phase'] = {
+            strategy = 'chat',
+            description = 'Clarifier → Designer → Planifier → Coder → Verifier',
+            opts = { index = 1, is_slash_cmd = false },
+            prompts = {
+              {
+                role = 'system',
+                content = [[
+You are a senior software engineer. Apply the 5-phase Superpowers methodology:
+
+PHASE 1 – CLARIFIER: Restate requirements in your own words. Ask targeted questions. Confirm acceptance criteria before anything else.
+PHASE 2 – DESIGNER: Propose an architecture. Identify applicable patterns. Consider edge cases and failure modes.
+PHASE 3 – PLANIFIER: Break the work into atomic, verifiable steps. Show the full plan and wait for approval before coding.
+PHASE 4 – CODER: Write clean, tested, self-documenting code. Follow the existing conventions in the codebase. Handle errors explicitly.
+PHASE 5 – VERIFIER: Review against original requirements. Check edge cases. Summarise what was done and what remains open.
+
+Be concise and direct. Flag issues proactively. When uncertain, say so.]],
+              },
+            },
+          },
+        },
+      })
+
+      -- ── Claude Code CLI in a vertical split (via ToggleTerm) ─────────────
+      local claude_term = nil
+      local function toggle_claude_code()
+        local Terminal = require('toggleterm.terminal').Terminal
+        if claude_term == nil then
+          claude_term = Terminal:new({
+            cmd = 'claude',
+            direction = 'vertical',
+            size = math.floor(vim.o.columns * 0.55),
+            close_on_exit = false,
+            on_open = function() vim.cmd('startinsert!') end,
+          })
+        end
+        claude_term:toggle()
+      end
+
+      -- ── Claude memory – persistent context file across sessions ──────────
+      local mem_path = vim.fn.stdpath('data') .. '/claude-mem.md'
+      local function ensure_mem()
+        if vim.fn.filereadable(mem_path) == 0 then
+          vim.fn.writefile({
+            '# Claude Memory',
+            ' ',
+            '## Last Session Summary',
+            ' ',
+            '## Ongoing Context',
+            ' ',
+            '## Recurring Reminders',
+            ' ',
+          }, mem_path)
+        end
+      end
+
+      -- ── CodeCompanion / Claude keymaps ────────────────────────────────────
+      map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<CR>', { desc = 'CC: chat' })
+      map({ 'n', 'v' }, '<leader>ca', '<cmd>CodeCompanionChat Add<CR>',    { desc = 'CC: add to chat' })
+      map({ 'n', 'v' }, '<leader>ci', '<cmd>CodeCompanion<CR>',            { desc = 'CC: inline' })
+      map('n',          '<leader>cp', '<cmd>CodeCompanionActions<CR>',     { desc = 'CC: actions (Superpowers)' })
+      map('n',          '<leader>cl', toggle_claude_code,                  { desc = 'Claude Code CLI' })
+      map('n', '<leader>cme', function()
+        ensure_mem()
+        vim.cmd('vsplit ' .. mem_path)
+      end, { desc = 'Claude memory: edit' })
+      map('n', '<leader>cms', function()
+        ensure_mem()
+        local content = table.concat(vim.fn.readfile(mem_path), '\n')
+        require('codecompanion').chat()
+        vim.defer_fn(function()
+          vim.api.nvim_paste('[SESSION MEMORY]\n' .. content .. '\n[/SESSION MEMORY]', true, -1)
+        end, 400)
+      end, { desc = 'Claude memory: inject into chat' })
     '';
   };
 }

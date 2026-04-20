@@ -8,7 +8,10 @@
     TERMINAL = "kitty";
     BROWSER = "firefox";
     NIXOS_OZONE_WL = "1";
+    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
   };
+
+  home.sessionPath = [ "$HOME/.npm-global/bin" ];
 
   programs.delta = {
     enable = true;
@@ -246,5 +249,6 @@
     zip
     telegram-desktop
     vscode
+    nodejs_22
   ];
 }

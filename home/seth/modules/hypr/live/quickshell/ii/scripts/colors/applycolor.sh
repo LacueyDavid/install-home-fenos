@@ -186,6 +186,9 @@ widgetStyle=kvantum
 ColorScheme=MaterialAdw
 Name=MaterialAdw
 shadeSortColumn=true
+
+[Icons]
+Theme=OneUI-dark
 EOF
 }
 
