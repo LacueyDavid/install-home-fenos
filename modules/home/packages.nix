@@ -6,7 +6,7 @@
     bear
     btop
     clang-tools
-    claude-code
+    claude-code-bin
     fd
     gh
     jq

@@ -117,3 +117,8 @@ sudo nixos-rebuild switch --show-trace  # Full stack trace for deep errors
 **Cause**: a file managed by home-manager already exists outside of it
 **Fix**: `find ~ -name "*.hm-backup"` to locate conflicts; remove or reconcile them.
   The flake sets `backupFileExtension = "hm-backup"` so collisions are visible.
+
+### `claude-code` build fails with npm 404
+**Symptom**: `curl: (22) The requested URL returned error: 404` on registry.npmjs.org during rebuild
+**Cause**: `pkgs.claude-code` compiles from npm source; the pinned tarball version gets removed from npm over time
+**Fix**: use `pkgs.claude-code-bin` instead — it fetches the pre-built binary, no npm dependency
