@@ -230,7 +230,6 @@
     bear
     btop
     clang-tools
-    claude-code-bin
     fd
     gh
     jq
