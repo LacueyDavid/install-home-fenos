@@ -118,7 +118,10 @@ sudo nixos-rebuild switch --show-trace  # Full stack trace for deep errors
 **Fix**: `find ~ -name "*.hm-backup"` to locate conflicts; remove or reconcile them.
   The flake sets `backupFileExtension = "hm-backup"` so collisions are visible.
 
-### `claude-code` build fails with npm 404
-**Symptom**: `curl: (22) The requested URL returned error: 404` on registry.npmjs.org during rebuild
-**Cause**: `pkgs.claude-code` compiles from npm source; the pinned tarball version gets removed from npm over time
-**Fix**: use `pkgs.claude-code-bin` instead — it fetches the pre-built binary, no npm dependency
+### `claude-code` or `claude-code-bin` build fails with 404
+**Symptom**: `curl: (22) The requested URL returned error: 404` on npm or Google Storage during rebuild
+**Cause**: nixpkgs pins a specific version whose upstream tarball/binary has since been deleted.
+  Both `pkgs.claude-code` (npm) and `pkgs.claude-code-bin` (GCS binary) can hit this.
+**Fix**: `cd /etc/nixos && nix flake update nixpkgs && git add flake.lock` then `switch`
+  This bumps nixpkgs to a commit with a newer working version.
+  Always `git add` after updating flake.lock — Nix reads the git index, not the filesystem.
