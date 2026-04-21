@@ -134,6 +134,7 @@
       coto = "nmcli dev wifi connect";
       nrs = "sudo nixos-rebuild switch --flake /etc/nixos#default";
       nrt = "sudo nixos-rebuild test --flake /etc/nixos#default";
+      qs = "quickshell -c ii";
       fenos-switch = "fenos_switch";
       fenos-test = "fenos_test";
       fss = "fenos_switch";
@@ -210,6 +211,10 @@
 
       [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+      # Load secrets (ANTHROPIC_API_KEY, etc.) from an untracked file.
+      # Create ~/.secrets/anthropic.env with: export ANTHROPIC_API_KEY=sk-ant-...
+      [[ -f ~/.secrets/anthropic.env ]] && source ~/.secrets/anthropic.env
+
       bindkey -e
       bindkey -s '^[e' 'v\n'
 
@@ -225,6 +230,7 @@
     bear
     btop
     clang-tools
+    claude-code
     fd
     gh
     jq

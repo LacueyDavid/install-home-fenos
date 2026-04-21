@@ -383,13 +383,13 @@
 
       map("n", "<leader>tr", "<cmd>ToggleTerm<CR>", { desc = "Terminal" })
 
-      -- ── CodeCompanion (Claude claude-opus-4-7 via Anthropic API) ─────────
+      -- ── CodeCompanion (Claude via Anthropic API) ──────────────────────
       require('codecompanion').setup({
         adapters = {
           anthropic = function()
             return require('codecompanion.adapters').extend('anthropic', {
               schema = {
-                model     = { default = 'claude-opus-4-7' },
+                model     = { default = 'claude-opus-4-5' },
                 max_tokens = { default = 8096 },
               },
             })
@@ -435,14 +435,25 @@ Be concise and direct. Flag issues proactively. When uncertain, say so.]],
       -- ── Claude Code CLI in a vertical split (via ToggleTerm) ─────────────
       local claude_term = nil
       local function toggle_claude_code()
+        if vim.fn.executable('claude') == 0 then
+          vim.notify('claude-code CLI not found in PATH. Run: home-manager switch', vim.log.levels.ERROR)
+          return
+        end
         local Terminal = require('toggleterm.terminal').Terminal
         if claude_term == nil then
           claude_term = Terminal:new({
             cmd = 'claude',
             direction = 'vertical',
-            size = math.floor(vim.o.columns * 0.55),
+            size = math.floor(vim.o.columns * 0.50),
             close_on_exit = false,
-            on_open = function() vim.cmd('startinsert!') end,
+            on_open = function(t)
+              vim.cmd('startinsert!')
+              -- Pass current file as context when opening
+              local file = vim.api.nvim_buf_get_name(0)
+              if file ~= ''' then
+                t:send('# Context: ' .. file, false)
+              end
+            end,
           })
         end
         claude_term:toggle()

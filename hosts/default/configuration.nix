@@ -2,7 +2,7 @@
 let
   fenosSessionLauncher = pkgs.writeShellScript "fenos-session-launcher" ''
     set -euo pipefail
-    exec dbus-run-session Hyprland
+    exec ${pkgs.hyprland}/bin/start-hyprland
   '';
 in {
   # Physical profile: no VM-specific virtio tuning here.
