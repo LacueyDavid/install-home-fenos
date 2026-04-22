@@ -56,7 +56,9 @@
       "Bash(nix-instantiate --parse /etc/nixos/modules/system/users.nix)",
       "Bash(nix-instantiate --parse /etc/nixos/modules/system/default.nix)",
       "Bash(git -C /etc/nixos status)",
-      "Bash(git -C /etc/nixos remote -v)"
+      "Bash(git -C /etc/nixos remote -v)",
+      "Bash(git push *)",
+      "Bash(git remote *)"
     ]
   }
 }
