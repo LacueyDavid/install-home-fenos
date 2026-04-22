@@ -3,8 +3,15 @@ let
   # Wrap `start-hyprland` in a D-Bus session. Otherwise start-hyprland exec's
   # itself into `dbus-run-session Hyprland`, losing its place in the process
   # tree and triggering Hyprland's "not started with start-hyprland" warning.
+  #
+  # Source home-manager session vars BEFORE launching Hyprland so that
+  # QML2_IMPORT_PATH / QT_PLUGIN_PATH are populated. Without this, quickshell
+  # exec-once at login runs before the shell init has sourced those vars and
+  # crashes on missing `Qt5Compat.GraphicalEffects`.
   sessionLauncher = pkgs.writeShellScript "fenos-session-launcher" ''
-    set -euo pipefail
+    set -e
+    hmVars=/etc/profiles/per-user/''${USER:-seth}/etc/profile.d/hm-session-vars.sh
+    if [ -f "$hmVars" ]; then set +u; . "$hmVars"; set -u; fi
     exec ${pkgs.dbus}/bin/dbus-run-session ${pkgs.hyprland}/bin/start-hyprland
   '';
 in
@@ -14,7 +21,7 @@ in
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd ${sessionLauncher}";
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd ${sessionLauncher}";
       user = "greeter";
     };
   };

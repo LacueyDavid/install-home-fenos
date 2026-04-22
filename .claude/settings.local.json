@@ -41,7 +41,21 @@
       "Bash(git -C /home/seth/feninstall-home remote -v)",
       "Bash(git -C /home/seth/feninstall-home status --short)",
       "Bash(git -C /home/seth/feninstall-home branch --show-current)",
-      "Bash(lsblk -dpno NAME,SIZE,MODEL,TYPE,RM)"
+      "Bash(lsblk -dpno NAME,SIZE,MODEL,TYPE,RM)",
+      "Bash(ip -4 addr show)",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new seth@192.168.1.30 'echo OK; uname -a; cat /etc/os-release')",
+      "Bash(nix --version)",
+      "Bash(nix-shell *)",
+      "Bash(nix run *)",
+      "Bash(SSHPASS=david7878 nix run *)",
+      "Bash(tar czf *)",
+      "Read(//tmp/**)",
+      "Bash(tar tzf *)",
+      "Bash(sudo nix *)",
+      "Bash(nix-instantiate --parse /etc/nixos/modules/system/programs.nix)",
+      "Bash(nix-instantiate --parse /etc/nixos/modules/system/users.nix)",
+      "Bash(nix-instantiate --parse /etc/nixos/modules/system/default.nix)",
+      "Bash(git -C /etc/nixos status)"
     ]
   }
 }

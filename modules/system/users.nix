@@ -10,15 +10,4 @@
     EDITOR = "nvim";
     VISUAL = "nvim";
   };
-
-  environment.systemPackages = with pkgs; [
-    curl
-    fd
-    git
-    htop
-    neovim
-    networkmanager
-    ripgrep
-    wget
-  ];
 }

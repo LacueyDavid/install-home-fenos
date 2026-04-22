@@ -8,5 +8,6 @@
     ./audio.nix
     ./desktop.nix
     ./users.nix
+    ./programs.nix
   ];
 }

@@ -147,6 +147,33 @@ sudo nixos-rebuild switch --show-trace  # Full stack trace for deep errors
   If already broken: in systemd-boot, pick the generation 1 entry (the bootstrap
   install), then `cd /etc/nixos && git pull && nixos-rebuild switch --flake .#pc`.
 
+### `set -u` in session launcher kills login when sourcing hm-session-vars.sh
+**Symptom**: login from greetd opens and closes the session in <1 second; Hyprland
+  never appears; journal shows `session opened for user seth` followed immediately by
+  `session closed for user seth`.
+**Cause**: `hm-session-vars.sh` guards with `if [ -n "$__HM_SESS_VARS_SOURCED" ]`.
+  With `set -u` (nounset) active in the session launcher, referencing that unset
+  variable exits the script before `exec` runs. greetd sees exit code ≠ 0 and
+  returns to the login screen.
+**Fix**: temporarily disable nounset around the source:
+  `if [ -f "$hmVars" ]; then set +u; . "$hmVars"; set -u; fi`
+  Also use `${USER:-seth}` fallback in case USER is unset in greetd context.
+
+### Quickshell crashes at Hyprland exec-once (works when launched from terminal)
+**Symptom**: the bar/wallpaper never show on login; manually running `quickshell`
+  from a terminal works fine. Log under `/run/user/1000/quickshell/by-id/*/log.log`
+  shows: `module "Qt5Compat.GraphicalEffects" is not installed`.
+**Cause**: greetd's session launcher exec's Hyprland without sourcing
+  `hm-session-vars.sh`, so `QML2_IMPORT_PATH` is empty at exec-once time.
+  `Qt5Compat.GraphicalEffects` lives under the user profile's qt-6/qml dir,
+  which home-manager only injects through that session-vars file. A terminal
+  works because zsh init sources it.
+**Fix**: source `hm-session-vars.sh` inside `sessionLauncher` in
+  `modules/system/desktop.nix` before `exec dbus-run-session start-hyprland`.
+  The launcher runs as the authenticated user, so
+  `/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh` is readable.
+  Rebuild + log out: `fss` then `Ctrl+Alt+Backspace` (or reboot).
+
 ### `claude-code` or `claude-code-bin` build fails with 404
 **Symptom**: `curl: (22) The requested URL returned error: 404` on npm or Google Storage during rebuild
 **Cause**: nixpkgs pins a specific version whose upstream tarball/binary has since been deleted.

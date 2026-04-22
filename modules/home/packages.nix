@@ -3,6 +3,7 @@
   home.packages = with pkgs; [
     alejandra
     bash-language-server
+    claude-code
     bear
     btop
     clang-tools
