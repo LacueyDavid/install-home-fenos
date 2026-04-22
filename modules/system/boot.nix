@@ -16,14 +16,20 @@
     allowDiscards = true;
   };
 
+  # Required so initrd ships btrfs userland (matches the disko layout
+  # used by `feninstall`: LUKS -> LVM -> btrfs on root and home).
+  boot.supportedFilesystems = [ "btrfs" ];
+
   fileSystems."/" = {
     device = "/dev/mapper/crypted--vg-root";
-    fsType = "ext4";
+    fsType = "btrfs";
+    options = [ "compress=zstd:1" "noatime" "ssd" "space_cache=v2" ];
   };
 
   fileSystems."/home" = {
     device = "/dev/mapper/crypted--vg-home";
-    fsType = "ext4";
+    fsType = "btrfs";
+    options = [ "compress=zstd:1" "noatime" "ssd" "space_cache=v2" ];
   };
 
   swapDevices = [

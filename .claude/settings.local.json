@@ -21,7 +21,27 @@
       "Bash(nixos-rebuild build *)",
       "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build)",
       "Bash(nix log *)",
-      "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build -C /home/seth/feninstall-home)"
+      "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build -C /home/seth/feninstall-home)",
+      "Bash(lsblk -f)",
+      "Read(//dev/disk/**)",
+      "Read(//dev/mapper/**)",
+      "Read(//usr/lib/**)",
+      "Bash(mount)",
+      "Read(//boot/**)",
+      "Read(//boot/loader/entries/**)",
+      "Read(//boot/EFI/**)",
+      "Read(//boot/loader/**)",
+      "Bash(sudo blkid *)",
+      "Bash(sudo lvs *)",
+      "Bash(sudo vgs *)",
+      "Read(//nix/**)",
+      "Bash(find / -maxdepth 3 -name \"nixos*\")",
+      "Read(//home/seth/**)",
+      "Bash(git -C /home/seth/feninstall-home show e5f7763 -- modules/system/boot.nix)",
+      "Bash(git -C /home/seth/feninstall-home remote -v)",
+      "Bash(git -C /home/seth/feninstall-home status --short)",
+      "Bash(git -C /home/seth/feninstall-home branch --show-current)",
+      "Bash(lsblk -dpno NAME,SIZE,MODEL,TYPE,RM)"
     ]
   }
 }

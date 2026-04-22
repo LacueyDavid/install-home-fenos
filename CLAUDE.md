@@ -134,6 +134,19 @@ sudo nixos-rebuild switch --show-trace  # Full stack trace for deep errors
   xdg.configFile."quickshell" = lib.mkForce { source = quickshellConfig; };
   ```
 
+### Emergency mode at first boot after `feninstall-home` (root mount fails)
+**Symptom**: first reboot after `feninstall-home` drops to emergency mode, stalling
+  in initrd while trying to mount `/dev/mapper/crypted--vg-root`.
+**Cause**: `create_feniso`'s disko layout (`create_feniso/nixos/disks.nix`) formats
+  root/home as **btrfs** with `compress=zstd:1,noatime,ssd,space_cache=v2`, but this
+  repo's `modules/system/boot.nix` previously declared them as `ext4`. `nixos-rebuild
+  boot` succeeds (Nix evaluation doesn't see the mismatch), then the next boot's
+  initrd asks the kernel to mount btrfs as ext4 → failure → emergency.
+**Fix**: keep `fsType = "btrfs"` and the matching mount options in `modules/system/boot.nix`,
+  and ship `boot.supportedFilesystems = [ "btrfs" ]` so initrd carries btrfs userland.
+  If already broken: in systemd-boot, pick the generation 1 entry (the bootstrap
+  install), then `cd /etc/nixos && git pull && nixos-rebuild switch --flake .#pc`.
+
 ### `claude-code` or `claude-code-bin` build fails with 404
 **Symptom**: `curl: (22) The requested URL returned error: 404` on npm or Google Storage during rebuild
 **Cause**: nixpkgs pins a specific version whose upstream tarball/binary has since been deleted.
