@@ -118,6 +118,22 @@ sudo nixos-rebuild switch --show-trace  # Full stack trace for deep errors
 **Fix**: `find ~ -name "*.hm-backup"` to locate conflicts; remove or reconcile them.
   The flake sets `backupFileExtension = "hm-backup"` so collisions are visible.
 
+### `xdg.configFile` subpath conflict: "outside $HOME"
+**Symptom**: rebuild fails with `Error installing file '.config/quickshell/default' outside $HOME`
+**Cause**: home-manager installs `xdg.configFile."quickshell"` as a symlink to the Nix store (read-only).
+  When it then resolves `xdg.configFile."quickshell/default"`, it follows that symlink and lands in `/nix/store/...`,
+  which is outside `$HOME`.
+**Fix**: don't mix a parent directory entry with child entries.  Instead, build a derivation
+  that contains all needed subdirs and use `lib.mkForce { source = derivation; }` on the parent:
+  ```nix
+  quickshellConfig = pkgs.runCommand "quickshell-config" {} ''
+    mkdir -p $out
+    ln -s ${shellConfig} $out/ii
+    ln -s ${shellConfig} $out/default
+  '';
+  xdg.configFile."quickshell" = lib.mkForce { source = quickshellConfig; };
+  ```
+
 ### `claude-code` or `claude-code-bin` build fails with 404
 **Symptom**: `curl: (22) The requested URL returned error: 404` on npm or Google Storage during rebuild
 **Cause**: nixpkgs pins a specific version whose upstream tarball/binary has since been deleted.

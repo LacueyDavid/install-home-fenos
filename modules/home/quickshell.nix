@@ -1,14 +1,17 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 let
-  # Our patched quickshell config (from dots-hyprland / illogical-impulse).
   shellConfig = ../../dotfiles/hypr/quickshell/ii;
+  # Build a directory with both `ii` and `default` entries pointing at our
+  # patched config.  This lets us override the upstream whole-directory
+  # xdg.configFile."quickshell" entry without creating a subpath conflict:
+  # home-manager would follow the store symlink when resolving
+  # "quickshell/default" and report it as "outside $HOME".
+  quickshellConfig = pkgs.runCommand "quickshell-config" {} ''
+    mkdir -p $out
+    ln -s ${shellConfig} $out/ii
+    ln -s ${shellConfig} $out/default
+  '';
 in
 {
-  # illogical-impulse installs `quickshell/ii` — we override the whole
-  # directory with our patched copy AND expose it as `default` too, so that
-  # plain `quickshell` (no -c) works as well as `quickshell -c ii`.
-  xdg.configFile = {
-    "quickshell/ii".source      = lib.mkForce shellConfig;
-    "quickshell/default".source = shellConfig;
-  };
+  xdg.configFile."quickshell" = lib.mkForce { source = quickshellConfig; };
 }

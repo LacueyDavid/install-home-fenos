@@ -19,7 +19,9 @@
       "Bash(nix flake *)",
       "Bash(git add *)",
       "Bash(nixos-rebuild build *)",
-      "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build)"
+      "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build)",
+      "Bash(nix log *)",
+      "Bash(nix --extra-experimental-features 'nix-command flakes' flake check --no-build -C /home/seth/feninstall-home)"
     ]
   }
 }
