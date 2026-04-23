@@ -58,7 +58,16 @@
       "Bash(git -C /etc/nixos status)",
       "Bash(git -C /etc/nixos remote -v)",
       "Bash(git push *)",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "Bash(hyprctl binds *)",
+      "Bash(quickshell *)",
+      "Bash(python3 /nix/store/7p8y4qkbcm5rsq2wgipzpyfcgzcpfdjp-ii/scripts/hyprland/get_keybinds.py --path ~/.config/hypr/hyprland/keybinds.conf)",
+      "Bash(hyprctl activewindow *)",
+      "Bash(hyprctl dispatch *)",
+      "Bash(echo \"venv exists: $?\")",
+      "Bash(/nix/store/7p8y4qkbcm5rsq2wgipzpyfcgzcpfdjp-ii/scripts/hyprland/get_keybinds.py --path ~/.config/hypr/hyprland/keybinds.conf)",
+      "Bash(fss)",
+      "Bash(fst)"
     ]
   }
 }

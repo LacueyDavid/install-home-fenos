@@ -13,6 +13,7 @@
     htop
     neovim
     networkmanager
+    psmisc
     ripgrep
     wget
   ];
