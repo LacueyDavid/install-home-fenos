@@ -126,11 +126,8 @@
           vimdoc
           yaml
         ];
-        settings = {
-          auto_install = false;
-          highlight.enable = true;
-          indent.enable = true;
-        };
+        highlight.enable = true;
+        indent.enable = true;
       };
 
       lsp = {

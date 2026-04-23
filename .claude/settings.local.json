@@ -67,7 +67,11 @@
       "Bash(echo \"venv exists: $?\")",
       "Bash(/nix/store/7p8y4qkbcm5rsq2wgipzpyfcgzcpfdjp-ii/scripts/hyprland/get_keybinds.py --path ~/.config/hypr/hyprland/keybinds.conf)",
       "Bash(fss)",
-      "Bash(fst)"
+      "Bash(fst)",
+      "WebSearch",
+      "WebFetch(domain:nix-community.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
